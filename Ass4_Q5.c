@@ -1,37 +1,84 @@
 #include <stdio.h>
-#include <limits.h>
+
 int main()
 {
-    int num, count = 0, max1 = INT_MIN, max2 = INT_MIN, max3 = INT_MIN;
-    while ((num = getchar()) != EOF)
+    int a,b,c,d,e,temp,tem;
+   
+    d=scanf("%d%d%d",&a,&b,&c);
+    if(d<3)
     {
-        if (num == 'n')
-            continue;
-
-        ungetc(num, stdin);
-        scanf("%d", &num);
-        if (num > max1)
-        {
-            max3 = max2;
-            max2 = max1;
-            max1 = num;
-        }
-        else if (num > max2 && num != max1)
-        {
-
-            max3 = max2;
-            max2 = num;
-        }
-        else if (num > max3 && num != max1 && num != max2)
-        {
-            max3 = num;
-        }
-        count++;
+        printf("not found");
+        goto end;
     }
-    if (count < 3)
-        printf("not found\n");
-    else
-        printf("\n%d\n", max3);
+    
+    int i,j,k;
+    if(a>=b && a>=c)
+    {
+        i=a;
+        if(b>=c)
+        {
+            j=b;
+            k=c;
+        }
+        else
+        {j=c;
+        k=b;}
+    }
 
+    if(b>=a && b>=c)
+    {
+        i=b;
+        if(a>=c)
+        {
+            j=a;
+            k=c;
+        }
+        else
+        {
+            j=c;
+            k=a;
+        }
+        
+    }
+    
+    if(c>=a && c>=b)
+    {
+        i=c;
+        if(b>=a)
+        {
+            j=b;
+            k=a;
+        }
+        else
+        {
+            j=a;
+            k=b;
+        }
+    }
+    
+    while(scanf("%d",&e)!=-1)
+    {
+        if(e>i)
+        {
+            temp=i;
+            i=e;
+            tem=j;
+            j=temp;
+            k=tem;
+        }
+        else if(e<=i && e>=j)
+        {
+            temp=j;
+            j=e;
+            k=temp;
+        }
+        else if(e>=k && e<=j )
+        {
+            k=e;
+        }
+        
+    }
+printf("%d",k);
+end:
     return 0;
 }
