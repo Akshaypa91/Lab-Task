@@ -1,5 +1,5 @@
 // 3rd maximum 
-// Credit by Bhavesh 
+// Credit by Coep Student's 
 
 #include <stdio.h>
 

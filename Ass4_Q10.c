@@ -1,5 +1,5 @@
 // Calculator
-// Credit by Bhavesh
+// Credit by Coep Student's
 
 #include <stdio.h>
 int main(){
