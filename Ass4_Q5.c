@@ -1,3 +1,6 @@
+// 3rd maximum 
+// Credit by Bhavesh 
+
 #include <stdio.h>
 
 int main()
