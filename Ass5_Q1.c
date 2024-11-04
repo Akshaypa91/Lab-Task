@@ -1,10 +1,9 @@
 #include <stdio.h>
 
 int isadigit(char ch) {
-    if (ch >= 'o' && ch <= '9')
-    {
-        return 1;
+    if (ch >= '0' && ch <= '9') {
+        return 1; 
     }
-    return 0;
+    return 0; 
 }
 
