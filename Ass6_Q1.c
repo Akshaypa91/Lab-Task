@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <limits.h>
 
-void minatzero(int a[], int len) {
+void movetozero(int a[], int len) {
 int add = 0, i = 0;
 
 int min = INT_MAX;
@@ -17,4 +17,3 @@ int temp = a[0];
 a[0] = a[add];
 a[add] = temp;
 }
-
