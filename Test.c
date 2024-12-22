@@ -1,45 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-#define LSA 1024  // Large_Size_Array(LAS)
 
 int main() {
-    char largeArray[LSA];
-    char **p;                         
-    int n;
+    int dayOfYear;
+    int month = 0, date = 0;
 
-    printf("Enter the number of lines: ");
-    scanf("%d", &n);
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    p = (char **)calloc(n , sizeof(char *));
+    scanf("%d", &dayOfYear);
 
-    getchar();
+    // if (dayOfYear < 1 || dayOfYear > 365) {
+    //     printf("invalid\n");
+    //     return 0;
+    // }
 
-    for (int i = 0; i < n; i++) {
-        printf("Enter line %d: ", i + 1);
-        if (fgets(largeArray, LSA, stdin) != NULL) {
-            largeArray[strcspn(largeArray, "\n")] = '\0';
-
-            p[i] = (char *)malloc(strlen(largeArray) + 1);
-
-            strcpy(p[i], largeArray);
+    for (month = 0; month < 12; month++) {
+        if (dayOfYear <= daysInMonth[month]) {
+            date = dayOfYear;  
+            break;
+        } 
+        else {
+            dayOfYear -= daysInMonth[month];  
         }
     }
-
-    int maxLenInd = 0;
-    for (int i = 1; i < n; i++) {
-        if (strlen(p[i]) > strlen(p[maxLenInd])) {
-            maxLenInd = i;
-        }
-    }
-
-    printf("The longest line is: %s\n", p[maxLenInd]);
-
-    for (int i = 0; i < n; i++) {
-        free(p[i]);
-    }
-    free(p);
-
+    printf("%d %d\n", date, month + 1);
     return 0;
 }

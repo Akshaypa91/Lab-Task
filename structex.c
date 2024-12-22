@@ -13,7 +13,7 @@ int main(void)
 {
 	struct course courses[100];
 	int cnt = 0;
-	while (scanf("%31s %15s z5d z5d %15s",
+	while (scanf("%31s %15s %d %d %15s",
 			courses[cnt].name,
 			courses[cnt].course_id,
 			&courses[cnt].credits,
@@ -44,9 +44,7 @@ int main(void)
 	printf("%d\n", total_credits);
 	printf("%d\n", lab_credits);
 	for (int i = 0; i < 6; i++) {
-		if (theory_credits[i] > 0) {
-			printf("%s %d\n", categories[i], theory_credits[i]);
-		}
+		printf("%s %d\n", categories[i], theory_credits[i]);
 	}
 	return 0;
 }
