@@ -32,6 +32,9 @@ int main(void)
 		if (courses[i].type == 2) {
 			lab_credits += courses[i].credits;
 		}
+		else if (courses[i].type == 2) {
+			lab_credits += courses[i].credits;
+		}
 		if (courses[i].type == 1) {
 			for (int j = 0; j < 6; j++) {
 				if (strcmp(courses[i].cat, categories[j]) == 0) {
