@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 
-int atoi(char *str)
+int atoi(const char *str)
 {
 	int num = 0, digit = 0;
 	int len = 0, check = 0, j = 0;
@@ -26,7 +26,7 @@ int atoi(char *str)
 	return check ? -1 * num : num;
 }
 
-float atof(char s[])
+double atof(const char s[])
 {
 	float result = 0.0;
 	int i = 0, sign = 1;
@@ -193,19 +193,4 @@ int myscanf(char *format, void *arg)
 		printf("Error\n");
 	return 0;
 	}
-}
-
-int main(void)
-{
-	int i;
-	int in;
-	unsigned int ui;
-	float f;
-	double d;
-	char arr[22];
-	char ch;
-
-	myscanf("%f", &f);
-	printf("%f", f);
-	return 0;
 }

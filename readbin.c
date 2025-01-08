@@ -1,65 +1,86 @@
 #include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <time.h>
+#include <string.h>
 
 typedef struct transaction {
-	double amount;
-	time_t time;
-	unsigned int from_id;
-	unsigned int to_id;
-	char location[32];
+    double amount;
+    time_t time;
+    unsigned int from_id;
+    unsigned int to_id;
+    char location[32];
 } transaction;
 
-void format_time(time_t t, char *buffer)
+void print_formated_time(time_t t)
 {
-	struct tm *tm_info = localtime(&t);
-	strftime(buffer, 20, "%d:%m:%Y %H:%M:%S", tm_info);
+    char str[20];
+    struct tm *tm_info;
+    tm_info = localtime(&t);
+
+    int hour = tm_info->tm_hour;
+
+    if (hour == 0) {
+        hour = 12;
+    } else if (hour > 12) {
+        hour -= 12;
+    }
+
+    strftime(str, sizeof(str), "%d:%m:%Y ", tm_info);
+    printf("%s", str);
+
+    printf("%02d:%02d:%02d", hour, tm_info->tm_min, tm_info->tm_sec);
 }
 
-int main(int argc, char *argv[])
+void print_min_record(int min, transaction p[])
 {
-	if (argc != 2) {
-		write(2, "Usage: ./readbin <filename>\n", 28);
-		return 1;
-	}
+    print_formated_time(p[min].time);
+}
 
-	int fd = open(argv[1], O_RDONLY);
-	if (fd < 0) {
-		perror("Error opening file");
-		return 1;
-	}
+int find_min_amount_record(transaction p[], int n)
+{
+    int i = 0;
+    int min_amount_indx = 0;
 
-	unsigned int n;
-	if (read(fd, &n, sizeof(unsigned int)) != sizeof(unsigned int)) {
-		write(2, "Error reading number of records\n", 32);
-		close(fd);
-		return 1;
-	}
+    while (i < n) {
+        if (p[i].amount < p[min_amount_indx].amount)
+            min_amount_indx = i;
+        i++;
+    }
+    return min_amount_indx;
+}
 
-	transaction t, min_t;
-	double min_amount = __DBL_MAX__;
-	char time_str[20];
+transaction *read_records(int fd, int n)
+{
+    int i = 0;
+    transaction *p = (transaction *)malloc(sizeof(transaction) * n);
 
-	for (unsigned int i = 0; i < n; i++) {
-		if (read(fd, &t, sizeof(transaction)) != sizeof(transaction)) {
-			write(2, "Error reading record\n", 21);
-			close(fd);
-			return 1;
-		}
-		if (t.amount < min_amount) {
-			min_amount = t.amount;
-			min_t = t;
-		}
-	}
+    while (i < n) {
+        read(fd, &p[i], sizeof(transaction));
+        i++;
+    }
+    return p;
+}
 
-	close(fd);
+int main()
+{
+    char filename[100];
+    int fd, min;
+    int n = 0;
 
-	format_time(min_t.time, time_str);
+    scanf("%s", filename);
 
-	dprintf(1, "Location: %s\n", min_t.location);
-	dprintf(1, "Time: %s\n", time_str);
+    fd = open(filename, O_RDONLY);
+    if (fd < 1) {
+        printf("Can't open the file: %s\n", filename);
+        return 0;
+    }
 
-	return 0;
+    read(fd, &n, sizeof(int));
+    transaction *p = read_records(fd, n);
+    min = find_min_amount_record(p, n);
+    print_min_record(min, p);
+    free(p);
+    return 0;
 }

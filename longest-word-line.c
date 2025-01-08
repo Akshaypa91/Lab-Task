@@ -1,71 +1,79 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <string.h>
 
-#define BUFFER_SIZE 1024
+#define MAX_LINE_LENGTH 1024
 
-int is_separator(char c)
-{
-	return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
+int find_longest_word_length(const char *line) {
+    int max_len = 0, current_len = 0;
+    for (int i = 0; line[i] != '\0'; i++) {
+        if (line[i] == ' ' || line[i] == '\n' || line[i] == '\t') {
+            if (current_len > max_len) {
+                max_len = current_len;
+            }
+            current_len = 0;
+        } else {
+            current_len++;
+        }
+    }
+    if (current_len > max_len) {
+        max_len = current_len;
+    }
+    return max_len;
 }
 
-int main(int argc, char *argv[])
-{
-	int fd = open(argv[1], O_RDONLY);
-	if (fd < 0) {
-		perror("Error opening file");
-		return 1;
-	}
+int main(int argc, char *argv[]) {
+    char filename[100];
 
-	char buffer[BUFFER_SIZE];
-	char longestWord[BUFFER_SIZE] = "";
-	char currentWord[BUFFER_SIZE] = "";
-	char longestLine[BUFFER_SIZE] = "";
-	char currentLine[BUFFER_SIZE] = "";
-	int bytesRead, wordIndex = 0, lineIndex = 0, maxWordLength = 0;
+	fgets(filename, sizeof(filename), stdin);
 
-	while ((bytesRead = read(fd, buffer, BUFFER_SIZE)) > 0) {
-		for (int i = 0; i < bytesRead; i++) {
-			currentLine[lineIndex++] = buffer[i];
+	size_t len = strlen(filename);
+	if (filename[len - 1] == '\n')
+		filename[len - 1] = '\0';
 
-			if (is_separator(buffer[i])) {
-				if (wordIndex > 0) {
-					currentWord[wordIndex] = '\0';
-					if (strlen(currentWord) > maxWordLength) {
-						maxWordLength = strlen(currentWord);
-						strcpy(longestWord, currentWord);
-						strcpy(longestLine, currentLine);
-					}
-					wordIndex = 0;
-				}
-				if (buffer[i] == '\n') {
-					lineIndex = 0;
-					currentLine[0] = '\0';
-				}
-			} else {
-				currentWord[wordIndex++] = buffer[i];
-			}
-		}
-	}
+	int file = open(filename, O_RDONLY);
+    if (file < 0) {
+        perror("Error");
+        return 1;
+    }
 
-	if (wordIndex > 0) {
-		currentWord[wordIndex] = '\0';
-		if (strlen(currentWord) > maxWordLength) {
-			maxWordLength = strlen(currentWord);
-			strcpy(longestWord, currentWord);
-			strcpy(longestLine, currentLine);
-		}
-	}
+    char line[MAX_LINE_LENGTH];
+    char longest_line[MAX_LINE_LENGTH] = "";
+    int max_word_length = 0;
+    ssize_t bytes_read;
+    char buffer[MAX_LINE_LENGTH];
+    int buffer_index = 0;
 
-	if (bytesRead < 0) {
-		perror("Error reading file");
-		close(fd);
-		return 1;
-	}
+    while ((bytes_read = read(file, buffer + buffer_index, sizeof(buffer) - buffer_index - 1)) > 0) {
+        buffer[bytes_read + buffer_index] = '\0';
+        char *start = buffer;
+        char *newline;
 
-	close(fd);
+        while ((newline = strchr(start, '\n')) != NULL) {
+            *newline = '\0';
+            strncpy(line, start, MAX_LINE_LENGTH);
+            line[MAX_LINE_LENGTH - 1] = '\0';
+            int current_longest_word = find_longest_word_length(line);
+            if (current_longest_word > max_word_length) {
+                max_word_length = current_longest_word;
+                strcpy(longest_line, line);
+            }
+            start = newline + 1;
+        }
 
-	write(1, longestLine, strlen(longestLine));
-	return 0;
+        buffer_index = strlen(start);
+        memmove(buffer, start, buffer_index);
+    }
+
+    close(file);
+
+    if (strlen(longest_line) > 0) {
+        printf("%s\n", longest_line);
+    } else {
+        printf("The file is empty or contains no valid lines.\n");
+    }
+
+    return 0;
 }

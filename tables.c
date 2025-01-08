@@ -2,57 +2,57 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_SUBJECTS 100
-#define MAX_STUDENTS 100
-#define MAX_NAME_LEN 50
-#define MAX_GRADES 8
+#define SUBJECTS 100
+#define STUDENTS 100
+#define NAME_LEN 50
+#define GRADES 8
 
 typedef struct
 {
-    char name[MAX_NAME_LEN];
+    char name[NAME_LEN];
     int credits;
     int semester;
 } Subject;
 
 typedef struct
 {
-    float ranges[MAX_GRADES];
+    float ranges[GRADES];
 } GradeRange;
 
 typedef struct
 {
-    char mis[MAX_NAME_LEN];
-    float marks[MAX_SUBJECTS];
+    char mis[NAME_LEN];
+    float marks[SUBJECTS];
 } Student;
 
-Subject subjects[MAX_SUBJECTS];
-GradeRange gradeRanges[MAX_SUBJECTS];
-Student students[MAX_STUDENTS];
+Subject subjects[SUBJECTS];
+GradeRange gradeRanges[SUBJECTS];
+Student students[STUDENTS];
 
 int numSubjects = 0;
 int numStudents = 0;
 
-void loadSubjects();
-void loadGrades();
-void loadMarks();
-char *getGrade(float marks, int subjectIndex);
-float calculateCGPA(char *mis);
-void handleQueries();
+// void lSubjects();
+// void lGrades();
+// void lMarks();
+// char *getGrade(float marks, int subjectIndex);
+// float calculateCGPA(char *mis);
+// void handleQueries();
 
 int main()
 {
     printf("Loading data...\n");
-    loadSubjects();
+    lSubjects();
     printf("Subjects loaded: %d\n", numSubjects);
-    loadGrades();
-    printf("Grades loaded for subjects.\n");
-    loadMarks();
-    printf("Marks loaded for students: %d\n", numStudents);
+    lGrades();
+    printf("Grades for subjects.\n");
+    lMarks();
+    printf("Marks for students: %d\n", numStudents);
     handleQueries();
     return 0;
 }
 
-void loadSubjects()
+void lSubjects()
 {
     FILE *file = fopen("subjects.csv", "r");
     if (!file)
@@ -60,11 +60,11 @@ void loadSubjects()
         printf("Error: Cannot open subjects.csv\n");
         exit(1);
     }
-    while (fscanf(file, "%[^,],%d,%d\n", subjects[numSubjects].name,
+    while (fscanf(file, "%c,%d,%d\n", &subjects[numSubjects].name,
                   &subjects[numSubjects].credits,
                   &subjects[numSubjects].semester) == 3)
     {
-        if (numSubjects >= MAX_SUBJECTS)
+        if (numSubjects >= SUBJECTS)
         {
             printf("Error: Exceeded maximum number of subjects.\n");
             exit(1);
@@ -74,7 +74,7 @@ void loadSubjects()
     fclose(file);
 }
 
-void loadGrades()
+void lGrades()
 {
     FILE *file = fopen("grades.csv", "r");
     if (!file)
@@ -84,7 +84,7 @@ void loadGrades()
     }
     for (int i = 0; i < numSubjects; i++)
     {
-        for (int j = 0; j < MAX_GRADES; j++)
+        for (int j = 0; j < GRADES; j++)
         {
             if (fscanf(file, "%f,", &gradeRanges[i].ranges[j]) != 1)
             {
@@ -97,7 +97,7 @@ void loadGrades()
     fclose(file);
 }
 
-void loadMarks()
+void lMarks()
 {
     FILE *file = fopen("marks.csv", "r");
     if (!file)
@@ -105,7 +105,7 @@ void loadMarks()
         printf("Error: Cannot open marks.csv\n");
         exit(1);
     }
-    while (fscanf(file, "%[^,],", students[numStudents].mis) == 1)
+    while (fscanf(file, "%c", &students[numStudents].mis) == 1)
     {
         for (int i = 0; i < numSubjects; i++)
         {
@@ -115,7 +115,7 @@ void loadMarks()
             }
         }
         fscanf(file, "\n");
-        if (numStudents >= MAX_STUDENTS)
+        if (numStudents >= STUDENTS)
         {
             printf("Error: Exceeded maximum number of students.\n");
             exit(1);
