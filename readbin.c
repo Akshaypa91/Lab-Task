@@ -13,74 +13,62 @@ typedef struct transaction {
     char location[32];
 } transaction;
 
-void print_formated_time(time_t t)
-{
-    char str[20];
-    struct tm *tm_info;
-    tm_info = localtime(&t);
+void print_transaction_details(const transaction *trans) {
+    char time_str[20];
+    struct tm *gmt_time = gmtime(&trans->time);
+    strftime(time_str, sizeof(time_str), "%d:%m:%Y %H:%M:%S", gmt_time);
 
-    int hour = tm_info->tm_hour;
-
-    if (hour == 0) {
-        hour = 12;
-    } else if (hour > 12) {
-        hour -= 12;
-    }
-
-    strftime(str, sizeof(str), "%d:%m:%Y ", tm_info);
-    printf("%s", str);
-
-    printf("%02d:%02d:%02d", hour, tm_info->tm_min, tm_info->tm_sec);
+    printf("%s\n", time_str);
 }
 
-void print_min_record(int min, transaction p[])
-{
-    print_formated_time(p[min].time);
-}
+int main(int argc, char *argv[]) {
 
-int find_min_amount_record(transaction p[], int n)
-{
-    int i = 0;
-    int min_amount_indx = 0;
-
-    while (i < n) {
-        if (p[i].amount < p[min_amount_indx].amount)
-            min_amount_indx = i;
-        i++;
-    }
-    return min_amount_indx;
-}
-
-transaction *read_records(int fd, int n)
-{
-    int i = 0;
-    transaction *p = (transaction *)malloc(sizeof(transaction) * n);
-
-    while (i < n) {
-        read(fd, &p[i], sizeof(transaction));
-        i++;
-    }
-    return p;
-}
-
-int main()
-{
     char filename[100];
-    int fd, min;
-    int n = 0;
 
-    scanf("%s", filename);
+	fgets(filename, sizeof(filename), stdin);
 
-    fd = open(filename, O_RDONLY);
-    if (fd < 1) {
-        printf("Can't open the file: %s\n", filename);
-        return 0;
+	size_t len = strlen(filename);
+	if (filename[len - 1] == '\n')
+		filename[len - 1] = '\0';
+    int fd = open(filename, O_RDONLY);
+    if (fd < 0) {
+        perror("Error opening file");
+        return 1;
     }
 
-    read(fd, &n, sizeof(int));
-    transaction *p = read_records(fd, n);
-    min = find_min_amount_record(p, n);
-    print_min_record(min, p);
-    free(p);
+    int n;
+    if (read(fd, &n, sizeof(int)) != sizeof(int)) {
+        perror("Error reading number of transactions");
+        close(fd);
+        return 1;
+    }
+
+    if (n <= 0) {
+        fprintf(stderr, "Invalid number of transactions in the file.\n");
+        close(fd);
+        return 1;
+    }
+
+    transaction min_trans, current_trans;
+    int is_first = 1;
+
+    for (int i = 0; i < n; i++) {
+        if (read(fd, &current_trans, sizeof(transaction)) != sizeof(transaction)) {
+            perror("Error reading transaction data");
+            close(fd);
+            return 1;
+        }
+
+        if (is_first || current_trans.amount < min_trans.amount) {
+            min_trans = current_trans;
+            is_first = 0;
+        }
+    }
+
+    close(fd);
+
+    print_transaction_details(&min_trans);
+
     return 0;
 }
+

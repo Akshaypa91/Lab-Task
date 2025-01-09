@@ -1,5 +1,7 @@
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
+#include <stdlib.h>
 
 int atoi(const char *str)
 {
@@ -136,24 +138,41 @@ int str_conversion(char *arg)
 	return 1;
 }
 
-int d_conversion(char *arg)
-{
-	char ch, d[11];
+int d_conversion(char *arg) {
+	char ch, d[12];
 	int i = 0;
 
-	while ((ch = getchar()) && (ch == '\t' || ch == '\n' || ch == ' ') && ch - '0' <= '9' - '0')
+	while ((ch = getchar()) && (ch == '\t' || ch == '\n' || ch == ' '))
 		;
+
+	if (ch == '-') {
+		d[i++] = ch;
+		ch = getchar();
+	}
+
+	if (!isdigit(ch)) {
+		return 0;
+	}
+
 	d[i++] = ch;
 
-	while (i < 11 && (ch = getchar()) && ch != '\t' && ch != ' ' && ch != '\n' && ch - '0' <= '9' - '0')
+	while (i < 11 && (ch = getchar()) && isdigit(ch)) {
 		d[i++] = ch;
+	}
 
 	d[i] = '\0';
-	int *p = (int *)arg;
 
-	*p = atoi(d);
+	long long num = atoll(d);
+	if (num < INT_MIN || num > INT_MAX) {
+		num = (num < INT_MIN) ? INT_MIN : INT_MAX;
+	}
+
+	int *p = (int *)arg;
+	*p = (int)num;
+
 	return 1;
 }
+
 
 int myscanf(char *format, void *arg)
 {
