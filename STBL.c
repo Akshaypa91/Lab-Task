@@ -14,42 +14,44 @@
 #define LINESIZE 1024
 #define MAXLEN 100
 
+// Using Enum for switch-case later on in the code
 enum Command {
-    Dis_File,
-    Dis_Marks,
-    Dis_Highest_Marks,
-    Avg_Makrs,
-    Find_SGPA,
-    Add_Entry,
-    Print_Count_Grades,
-    Update_Entry,
-    Std_Deviation,
-    Print_Top_Students,
+    DISPLAY_FILE,
+    DISPLAY_MARKS,
+    DISPLAY_HIGHEST_MARKS,
+    AVERAGE_MARKS,
+    FIND_SGPA,
+    ADD_ENTRY,
+    PRINT_COUNT_OF_GRADES,
+    UPDATE_ENTRY,
+    STANDARD_DEVIATION,
+    PRINT_TOP_STUDENTS,
     EXIT,
     INVALID_COMMAND,
 };
 
+// function to get command from user input which will be used in switch-case
 enum Command GetCommandFromName( char *command) {
     if (strcmp(command, "print") == 0) {
-        return Dis_File;
+        return DISPLAY_FILE;
     } else if (strcmp(command, "marks") == 0) {
-        return Dis_Marks;
+        return DISPLAY_MARKS;
     } else if (strcmp(command, "highest") == 0) {
-        return Dis_Highest_Marks;
+        return DISPLAY_HIGHEST_MARKS;
     } else if (strcmp(command, "avg") == 0) {
-        return Avg_Makrs;
+        return AVERAGE_MARKS;
     } else if (strcmp(command, "sgpa") == 0) {
-        return Find_SGPA;
+        return FIND_SGPA;
     } else if (strcmp(command, "add") == 0) {
-        return Add_Entry;
+        return ADD_ENTRY;
     } else if (strcmp(command, "count") == 0) {
-        return Print_Count_Grades;
+        return PRINT_COUNT_OF_GRADES;
     } else if (strcmp(command, "update") == 0) {
-        return Update_Entry;
+        return UPDATE_ENTRY;
     } else if (strcmp(command, "stdev") == 0) {
-        return Std_Deviation;
+        return STANDARD_DEVIATION;
     } else if (strcmp(command, "top") == 0) {
-        return Print_Top_Students;
+        return PRINT_TOP_STUDENTS;
     } else if (strcmp(command, "exit") == 0) {
         return EXIT;
     } else {
@@ -57,6 +59,7 @@ enum Command GetCommandFromName( char *command) {
     }
 }
 
+// structure to store data
 typedef struct Studentv{
     char name[128];
     long long MIS;
@@ -71,6 +74,7 @@ typedef struct Studentv{
     float CGPA;
 } Student;
 
+// readline function used for reading the csv file
 int readline(int fd, char line[], int max) {
     int i = 0;
     char ch;
@@ -83,6 +87,7 @@ int readline(int fd, char line[], int max) {
     return i;
 }
 
+// readcsv function stores data into an array of structures
 int readcsv(char *filename, Student student[], int size) {
     char line[LINESIZE];
     int fd;
@@ -126,6 +131,7 @@ int readcsv(char *filename, Student student[], int size) {
     return count;
 }
 
+// function to display the CSV file which was read by readcsv function
 void print_student(Student student[], int len) {
     int i;
     for (i = 0; i < len; i++) {
@@ -145,6 +151,7 @@ void print_student(Student student[], int len) {
     }
 }
 
+// function to find index of subject rfom its name which is used a lot in the program
 int SubjectIndex(Student student[], char subject[]) {
     for (int j = 0; j < MAX_SUBJECTS; j++) {
         if (strcmp(subject, student[0].subjects[j]) == 0) {
@@ -154,6 +161,7 @@ int SubjectIndex(Student student[], char subject[]) {
     return -1;
 }
 
+// Qa.2 function to display marks of a given student, specified by name, in a particular subject
 void display_marks(Student student[], int limit, char subject[], char name[]) {
     int subjectIndex = SubjectIndex(student, subject);
 
@@ -166,6 +174,7 @@ void display_marks(Student student[], int limit, char subject[], char name[]) {
     printf("Not found\n");
 }
 
+// Qa.3 function to show name(s) and MISID(s) of all students with the highest marks in a given subject
 void findHighestMarks(Student student[], int numstudents, char subject[]) {
     float highestMarks = -1.0;
     int subjectIndex = SubjectIndex(student, subject);
@@ -188,6 +197,7 @@ void findHighestMarks(Student student[], int numstudents, char subject[]) {
     }
 }
 
+// Qa.4 function to show average marks in a given subject
 float calculateSubjectAverage(Student student[], int numStudents, char subject[]) {
     float totalMarks = 0.0;
 
@@ -207,6 +217,7 @@ float calculateSubjectAverage(Student student[], int numStudents, char subject[]
 
     return averageMarks;
 }
+// function to find the SGPA of a student in a particular semester
 void calculateSGPA(Student students[], int count, int sem, long long mis) {
     float grades_credits = 0;
     int credits = 0;
@@ -231,6 +242,7 @@ void calculateSGPA(Student students[], int count, int sem, long long mis) {
     }
 }
 
+// I used this function for Qa.10 while listing top n students based on cgpa
 float calculateCGPA(Student student) {
     float totalGradePoints = 0.0;
     int totalCredits = 0;
@@ -244,8 +256,9 @@ float calculateCGPA(Student student) {
     return SGPA;
 }
 
+// Qa.7 function to Print the count of number of students with each grade in a given course
 void printGradeCount(Student students[], int numStudents, char subject[]) {
-    int gradeCount[11] = {0};
+    int gradeCount[11] = {0}; // Array to store the count of each grade
 
     int subjectIndex = SubjectIndex(students, subject);
 
@@ -265,6 +278,7 @@ void printGradeCount(Student students[], int numStudents, char subject[]) {
     printf("\n");
 }
 
+// I used this function to calculate mean required to find standard deviation in Qa.9
 float calculateMean(Student student[], int numStudents, int subjectIndex) {
     float sum = 0.0;
 
@@ -275,6 +289,7 @@ float calculateMean(Student student[], int numStudents, int subjectIndex) {
     return sum / numStudents;
 }
 
+// Qa.9 function to Find the standard deviation of the marks of students in a particular course
 float calculateStandardDeviation(Student student[], int numStudents, char subject[]) {
     float sumSquaredDifferences = 0.0;
     int subjectIndex = SubjectIndex(student, subject);
@@ -299,6 +314,7 @@ float calculateStandardDeviation(Student student[], int numStudents, char subjec
     return stddev;
 }
 
+// Qa.10 function to List the top n students in a class based on their CGPA, where n is specified
 void listTopStudents(Student students[], int numStudents, int topN, int year) {
 
     for (int i = 0; i < numStudents - 1; i++) {
@@ -319,6 +335,7 @@ void listTopStudents(Student students[], int numStudents, int topN, int year) {
     }
 }
 
+// prints a menu for diplaying users various commands that can be given
 void PrintMenu() {
     printf("***********************************************\n");
     printf("Enter any command: \n");
@@ -457,10 +474,10 @@ int main(int argc, char *argv[]) {
             
             switch (command) {
 
-            case Dis_File:
+            case DISPLAY_FILE:
                 print_student(student, count);
                 break;
-            case Dis_Marks:
+            case DISPLAY_MARKS:
 
                 p++;
                 while(*p != '\n' && *p != '\0'){
@@ -485,19 +502,19 @@ int main(int argc, char *argv[]) {
 
                 display_marks(student, count, subject, name);
                 break;
-            case Dis_Highest_Marks:
+            case DISPLAY_HIGHEST_MARKS:
                 p++;
                 strcpy(subject, p);
 
                 findHighestMarks(student, count, subject);
                 break;
-            case Avg_Makrs:
+            case AVERAGE_MARKS:
                 p++;
                 strcpy(subject, p);
 
                 calculateSubjectAverage(student, count,subject);
                 break;
-            case Find_SGPA:
+            case FIND_SGPA:
                 p++;
                 while(*p != '\n' && *p != '\0'){
                     p++;
@@ -522,7 +539,7 @@ int main(int argc, char *argv[]) {
 
                 calculateSGPA(student, count, sem, mis);
                 break;
-            case Add_Entry:{
+            case ADD_ENTRY:{
                 int fd = open(argv[1], O_APPEND | O_WRONLY);
                 if(fd == -1){
                     perror("open failed!\n");
@@ -544,13 +561,13 @@ int main(int argc, char *argv[]) {
                 count = readcsv(argv[1], student, MAX_STUDENTS);
                 break;
             }
-            case Print_Count_Grades:
+            case PRINT_COUNT_OF_GRADES:
                 p++;
                 strcpy(subject, p);
 
                 printGradeCount(student, count, subject);
                 break;
-            case Update_Entry:
+            case UPDATE_ENTRY:
                 p++;
                 while(*p != '\n' && *p != '\0'){
                     p++;
@@ -612,13 +629,13 @@ int main(int argc, char *argv[]) {
 
                 writecsv(argv[1],student,count);
                 break;
-            case Std_Deviation:
+            case STANDARD_DEVIATION:
                 p++;
                 strcpy(subject, p);
 
                 calculateStandardDeviation(student, count, subject);
                 break;
-            case Print_Top_Students:
+            case PRINT_TOP_STUDENTS:
                 p++;
                 while(*p != '\n' && *p != '\0'){
                     p++;
